@@ -1,13 +1,6 @@
 import { AxiosInstance, isAxiosError } from "axios";
 import winston from "winston";
 
-interface GetCoinTickerParams {
-    id: string,
-    exchange_ids: string | undefined,
-    include_exchange_logo: boolean | undefined,
-    page: number | undefined,
-}
-
 class CoingeckoApi {
     private axios: AxiosInstance;
     private logger: winston.Logger;
@@ -64,19 +57,42 @@ class CoingeckoApi {
     }
 
     async coinInfo(coin_id: string) {
-        const url = `/coins/`
+        const url = `/coins/${coin_id}`
         const params = {
             params: {
-                id: coin_id
+                localization: 'en',
+                tickers: false,
+                market_data: false,
+                community_data: false,
+                developer_data: false,
+                sparkline: false
             }
         }
+    
+        try {
+            const response = await this.axios.get(url);
+
+            if (!response.data) {
+                return undefined;
+            }
+
+            return response.data;
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }));
+            return undefined;
+        }
+    }
+
+    async coinTickers(coin_id: string, page = 1) {
+        const url = `/coins/${coin_id}/tickers`
+
+        const params = { params: { include_exchange_logo: true, page } };
 
         try {
             const response = await this.axios.get(url, params)
 
-            const null_response = !response.data || response.data.length < 1
-            if (null_response) {
-                return undefined
+            if (!response.data) {
+                return undefined;
             }
 
             return response.data;
@@ -86,25 +102,16 @@ class CoingeckoApi {
         }
     }
 
-    async coinTickers(coin_id: string, exchange_ids?: string[], include_exchange_logo?: boolean, page?: number) {
-        const url = `/coins/${coin_id}/tickers`
-        const exchange_ids_str = exchange_ids ? exchange_ids.join(',') : undefined
+    async coinChart(coin_id: string) {
+        const url = `/coins/${coin_id}/market_chart`;
 
-        const params: { params: GetCoinTickerParams } = {
-            params: {
-                id: coin_id,
-                exchange_ids: exchange_ids_str,
-                include_exchange_logo,
-                page: page
-            }
-        }
+        const params = { params: {vs_currency: 'usd', days: 30, interval: 'daily'} };
 
         try {
             const response = await this.axios.get(url, params)
 
-            const null_response = !response.data || response.data.length < 1
-            if (null_response) {
-                return undefined
+            if (!response.data) {
+                return undefined;
             }
 
             return response.data;
