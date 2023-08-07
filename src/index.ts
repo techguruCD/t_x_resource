@@ -3,10 +3,10 @@ dotenv.config();
 
 import loggersUtil from './utils/loggers.util';
 import mongoose from 'mongoose';
-import cmcCoinListCron from './cmc-scripts/coinList.cron';
-import cmcMetadataCron from './cmc-scripts/metadata.cron';
-import bqCoinsCron from './biquery-scripts/bqCoins.cron';
-import bqPairsCron from './biquery-scripts/bqPairs.cron';
+// import cmcCoinListCron from './cmc-scripts/coinList.cron';
+// import cmcMetadataCron from './cmc-scripts/metadata.cron';
+// import bqCoinsCron from './biquery-scripts/bqCoins.cron';
+// import bqPairsCron from './biquery-scripts/bqPairs.cron';
 
 
 if (!process.env['DB_URI']) {
@@ -33,34 +33,35 @@ if (!process.env['CW_API_KEY']) {
 
         loggersUtil.mainLogger.info(`connected to ${db.connection.db.databaseName}`);
 
-        cmcCoinListCron.cron.start();
-        cmcMetadataCron.cron.start();
-        bqCoinsCron.bqEthCoinsCron.start();
-        bqCoinsCron.bqMaticCoinsCron.start();
-        bqCoinsCron.bqBscCoinsCron.start();
-        bqCoinsCron.bqVelasCoinsCron.start();
-        bqCoinsCron.bqKlaytnCoinsCron.start();
-        bqCoinsCron.bqAvalancheCoinsCron.start();
-        bqCoinsCron.bqFantomCoinsCron.start();
-        bqCoinsCron.bqMoonbeamCoinsCron.start();
-        bqCoinsCron.bqCronosCoinsCron.start();
-        bqCoinsCron.bqEthClassicCoinsCron.start();
-        bqCoinsCron.bqCeloCoinsCron.start();
-        bqCoinsCron.bqConfluxCoinsCron.start();
-        bqCoinsCron.bqEosCoinsCron.start();
-        bqCoinsCron.bqTronCoinsCron.start();
-        bqCoinsCron.bqAlgorandCoinsCron.start();
+        // cmcCoinListCron.cron.start();
+        // cmcMetadataCron.cron.start();
+        // bqCoinsCron.bqEthCoinsCron.start();
+        // bqCoinsCron.bqMaticCoinsCron.start();
+        // bqCoinsCron.bqBscCoinsCron.start();
+        // bqCoinsCron.bqVelasCoinsCron.start();
+        // bqCoinsCron.bqKlaytnCoinsCron.start();
+        // bqCoinsCron.bqAvalancheCoinsCron.start();
+        // bqCoinsCron.bqFantomCoinsCron.start();
+        // bqCoinsCron.bqMoonbeamCoinsCron.start();
+        // bqCoinsCron.bqCronosCoinsCron.start();
+        // bqCoinsCron.bqEthClassicCoinsCron.start();
+        // bqCoinsCron.bqCeloCoinsCron.start();
+        // bqCoinsCron.bqConfluxCoinsCron.start();
+        // bqCoinsCron.bqEosCoinsCron.start();
+        // bqCoinsCron.bqTronCoinsCron.start();
+        // bqCoinsCron.bqAlgorandCoinsCron.start();
 
 
-        bqPairsCron.bqEthPairsCron.cron.start(),
-        bqPairsCron.bqBscPairsCron.cron.start(),
-        bqPairsCron.bqMaticPairsCron.cron.start(),
-        bqPairsCron.bqVelasPairsCron.cron.start();
-        bqPairsCron.bqKlaytnPairsCron.cron.start();
-        bqPairsCron.bqAvalanchePairsCron.cron.start();
-        bqPairsCron.bqFantomPairsCron.cron.start();
-        bqPairsCron.bqMoonbeamPairsCron.cron.start();
-        bqPairsCron.bqCronosPairsCron.cron.start();
+        // bqPairsCron.bqEthPairsCron.fetchData()//.cron.start(),
+        // bqPairsCron.bqBscPairsCron.fetchData()//.cron.start(),
+        // bqPairsCron.bqMaticPairsCron.fetchData()//.cron.start(),
+        // bqPairsCron.bqVelasPairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqKlaytnPairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqAvalanchePairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqFantomPairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqMoonbeamPairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqCronosPairsCron.fetchData()//.cron.start();
+        // bqPairsCron.bqCeloMainnetPairsCron.fetchData()//.cron.start();
 
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);
