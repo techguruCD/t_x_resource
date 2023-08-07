@@ -1,0 +1,67 @@
+import cron from 'node-cron';
+import axiosUtil from '../utils/axios.util';
+import loggersUtil from '../utils/loggers.util';
+import CoingeckoApi from '../utils/coingecko.utils';
+import cgModel from './cgModel';
+
+const axios = axiosUtil.coingeckoAxios;
+const logger = loggersUtil.cgLogger;
+const cgApi = new CoingeckoApi(axios, logger);
+
+class CGCoinInfoCron {
+    private cronExpression = '0 */6 * * *' // every 6 hours
+    cron = cron.schedule(this.cronExpression, async () => {
+        await this.fetchData();
+    }, { scheduled: false });
+
+    private async upsertData(coinId: string, data: any) {
+        try {
+            await cgModel.CGCoinInfoModel.updateOne({ id: coinId }, { $set: data }, { upsert: true });
+        } catch (error: any) {
+            console.log(error);
+            logger.error(error.message)
+        }
+    }
+
+    async fetchData() {
+        let dbOffset = 1000;
+
+        while (true) {
+            logger.info(`fetching CGListModel with dbOffset ${dbOffset}`);
+            const ids = await cgModel.CGListModel.aggregate([
+                { $sort: { market_cap: -1 } },
+                { $skip: dbOffset },
+                { $limit: 1000 },
+                { $group: { _id: null, ids: { $addToSet: "$id" } } },
+            ]);
+
+            if (ids.length < 1) {
+                logger.info(`No more data in CGListModel for coinInfo`);
+                break;
+            }
+
+            if (ids[0].ids.length < 1) {
+                logger.info(`No more data in CGListModel for coinInfo`);
+                break;
+            }
+
+            for (const id of ids[0].ids) {
+                const coinInfo = await cgApi.coinInfo(id);
+
+                
+                if (!coinInfo) {
+                    continue;
+                }
+                
+                this.upsertData(id, coinInfo);
+            }
+
+            dbOffset += ids[0].ids.length;
+        }
+        return;
+    }
+}
+
+const cgCoinInfoCron = new CGCoinInfoCron();
+
+export default cgCoinInfoCron;
