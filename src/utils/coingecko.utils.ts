@@ -54,7 +54,32 @@ class CoingeckoApi {
             this.logError(error, JSON.stringify({ url, params }));
             return undefined;
         }
+    }
 
+    async getCoinInfo(coinId: string) {
+        const url = `/coins/`
+        const params = {
+            params: {
+                id: coinId
+            }
+        }
+
+        try {
+            const response = await this.axios.get(url, { params })   
+
+            if (!response.data) {
+                return undefined
+            }
+
+            if (response.data.length < 1) {
+                return undefined;
+            }
+
+            return response.data;
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }))
+            return undefined
+        }
     }
 }
 
