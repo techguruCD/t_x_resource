@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 // import cmcMetadataCron from './cmc-scripts/metadata.cron';
 // import bqCoinsCron from './biquery-scripts/bqCoins.cron';
 // import bqPairsCron from './biquery-scripts/bqPairs.cron';
+// import cgCoinListCron from './cg-scripts/coinList.cron';
 
 
 if (!process.env['DB_URI']) {
@@ -62,6 +63,8 @@ if (!process.env['CW_API_KEY']) {
         // bqPairsCron.bqMoonbeamPairsCron.fetchData()//.cron.start();
         // bqPairsCron.bqCronosPairsCron.fetchData()//.cron.start();
         // bqPairsCron.bqCeloMainnetPairsCron.fetchData()//.cron.start();
+
+        // await cgCoinListCron.cron.start();
 
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);

@@ -34,19 +34,24 @@ class CoingeckoApi {
             }
         };
 
-        const response = await this.axios.get(url, params);
         try {
+            const response = await this.axios.get(url, params);
+
             if (!response.data) {
                 return undefined;
             }
 
-            if (Array.isArray(response.data) && response.data.length < 1) {
+            if (!Array.isArray(response.data)) {
+                return undefined;
+            }
+
+            if (response.data.length < 1) {
                 return undefined;
             }
 
             return response.data;
-        } catch (error) {
-            this.logError(error, JSON.stringify({url, params}));
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }));
             return undefined;
         }
 
