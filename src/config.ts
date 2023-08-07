@@ -9,7 +9,7 @@ const config = {
         "X-CMC_PRO_API_KEY": process.env['CMC_API_KEY']
     },
 
-    coingeckoUrl: "https://api.coingecko.com/api/v3",
+    coingeckoUrl: "https://pro-api.coingecko.com/api/v3",
     coingeckoHeaders: {
         "x-cg-pro-api-key": process.env['CG_API_KEY']
     },
