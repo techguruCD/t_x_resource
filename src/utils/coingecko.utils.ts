@@ -89,13 +89,13 @@ class CoingeckoApi {
     async getCoinTickers(coin_id: string, exchange_ids?: string[], include_exchange_logo?: boolean, page?: number) {
         const url = `/coins/${coin_id}/tickers`
         const exchange_ids_str = exchange_ids ? exchange_ids.join(',') : undefined
-        
+
         const params: { params: GetCoinTickerParams } = {
             params: {
                 id: coin_id,
                 exchange_ids: exchange_ids_str,
                 include_exchange_logo,
-                page: page ?? 100
+                page: page
             }
         }
 
