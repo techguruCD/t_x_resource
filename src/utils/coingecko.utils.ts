@@ -118,6 +118,32 @@ class CoingeckoApi {
             return undefined
         }
     }
+
+    async coinPrices(coin_ids: string[], vs_currencies: string[]) {
+        const url = `/simple/price`;
+
+        const params = {
+            ids: coin_ids.join(','),
+            vs_currencies: vs_currencies.join(','),
+            include_market_cap: true,
+            include_24hr_vol: false,
+            include_24hr_change: false,
+            include_last_updated_at: true
+        }
+
+        try {
+            const response = await this.axios.get(url, { params });
+
+            if (!response.data) {
+                return undefined;
+            }
+
+            return response.data;
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }))
+            return undefined
+        }
+    }
 }
 
 export default CoingeckoApi;
