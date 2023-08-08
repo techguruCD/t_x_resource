@@ -16,9 +16,11 @@ class CGCoinPricesCron {
 
     private async upsertData(data: any) {
         try {
+            const coinIds = Object.keys(data)
             const bulkWriteOperations: any[] = []
 
-            data.forEach((coinData: any) => {
+            coinIds.forEach((coinId) => {
+                const coinData = data[coinId]
                 const condition = { id: coinData.id }
                 const coinDataUpdateOperation = {
                     $set: {
@@ -33,50 +35,50 @@ class CGCoinPricesCron {
                         filter: condition,
                         update: coinDataUpdateOperation
                     }
-                    })
+                })
             })
 
             await cgModel.CGListModel.bulkWrite(bulkWriteOperations)
-                .then(result => { console.log(`${result.modifiedCount} documents updated`) })
-                .catch(error = > { `Error updating documents: ${error}`})
-    } catch(error: any) {
-        logger.error(error.message)
+
+            logger.info(`Updated ${coinIds.length} coins`)
+        } catch (error: any) {
+            logger.error(error.message)
+        }
     }
-}
 
     async fetchData() {
-    let dbOffset = 0;
+        let dbOffset = 0;
 
-    while (true) {
-        const ids = await cgModel.CGListModel.aggregate([
-            { $skip: dbOffset },
-            { $limit: 250 },
-            { $group: { _id: null, ids: { $addToSet: "$id" } } },
-        ]);
+        while (true) {
+            const ids = await cgModel.CGListModel.aggregate([
+                { $skip: dbOffset },
+                { $limit: 250 },
+                { $group: { _id: null, ids: { $addToSet: "$id" } } },
+            ]);
 
-        if (ids.length < 1) {
-            break;
+            if (ids.length < 1) {
+                break;
+            }
+
+            if (ids[0].ids.length < 1) {
+                break;
+            }
+
+            // TODO: Add type for coinPrices returned data
+            const coinsData = ids[0].ids
+            const coinPricesData = await cgApi.coinPrices(coinsData);
+
+            if (!coinPricesData) {
+                continue;
+            }
+
+            this.upsertData(coinPricesData);
+            logger.info(dbOffset)
+            dbOffset += coinsData.length;
         }
 
-        if (ids[0].ids.length < 1) {
-            break;
-        }
-
-        // TODO: Add type for coinPrices returned data
-        const coinIds = ids[0].ids
-        const coinPricesData = await cgApi.coinPrices(coinIds);
-        console.log(coinPricesData)
-        if (!coinPricesData) {
-            continue;
-        }
-
-        // this.upsertData(coinPricesData);
-        // console.log(ids)
-        dbOffset += coinIds.length;
+        return;
     }
-
-    return;
-}
 }
 
 const cgCoinPricesCron = new CGCoinPricesCron();
