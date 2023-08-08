@@ -4,7 +4,7 @@ dotenv.config();
 import loggersUtil from './utils/loggers.util';
 import mongoose from 'mongoose';
 import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
-import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
+// import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
 // import cmcCoinListCron from './cmc-scripts/coinList.cron';
 // import cmcMetadataCron from './cmc-scripts/metadata.cron';
 // import bqCoinsCron from './biquery-scripts/bqCoins.cron';
@@ -68,7 +68,7 @@ if (!process.env['CW_API_KEY']) {
 
         // await cgCoinListCron.cron.start();
         await cgCoinInfoCron.fetchData();
-        await cgCoinTickersCron.fetchData();
+        // await cgCoinTickersCron.fetchData();
 
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);

@@ -24,41 +24,36 @@ class CGCoinInfoCron {
     }
 
     async fetchData() {
-        let dbOffset = 1000;
+        const ids = await cgModel.CGListModel.aggregate([
+            { $sort: { market_cap: 1 } },
+            {
+                $group: {
+                _id: null,
+                ids: { $push: "$id" },
+                },
+            },
+        ]);
 
-        while (true) {
-            logger.info(`fetching CGListModel with dbOffset ${dbOffset}`);
-            const ids = await cgModel.CGListModel.aggregate([
-                { $sort: { market_cap: -1 } },
-                { $skip: dbOffset },
-                { $limit: 1000 },
-                { $group: { _id: null, ids: { $addToSet: "$id" } } },
-            ]);
-
-            if (ids.length < 1) {
-                logger.info(`No more data in CGListModel for coinInfo`);
-                break;
-            }
-
-            if (ids[0].ids.length < 1) {
-                logger.info(`No more data in CGListModel for coinInfo`);
-                break;
-            }
-
-            for (const id of ids[0].ids) {
-                const coinInfo = await cgApi.coinInfo(id);
-
-                
-                if (!coinInfo) {
-                    continue;
-                }
-                
-                this.upsertData(id, coinInfo);
-            }
-
-            dbOffset += ids[0].ids.length;
+        if (ids.length < 1) {
+            logger.info(`No more data in CGListModel for coinInfo`);
+            return;
         }
-        return;
+
+        if (ids[0].ids.length < 1) {
+            logger.info(`No more data in CGListModel for coinInfo`);
+            return;
+        }
+
+        for (const id of ids[0].ids) {
+            const coinInfo = await cgApi.coinInfo(id);
+
+            
+            if (!coinInfo) {
+                continue;
+            }
+            
+            this.upsertData(id, coinInfo);
+        }
     }
 }
 
