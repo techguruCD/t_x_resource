@@ -31,7 +31,7 @@ class CGCoinPricesCron {
                 }
 
                 bulkWriteOperations.push({
-                    updateMany: {
+                    updateOne: {
                         filter: condition,
                         update: coinDataUpdateOperation
                     }
@@ -40,15 +40,15 @@ class CGCoinPricesCron {
 
             await cgModel.CGListModel.bulkWrite(bulkWriteOperations)
 
-            logger.info(`Updated ${coinIds.length} coins`)
+            logger.info(`Updated prices data for ${coinIds.length} coins`)
         } catch (error: any) {
             logger.error(error.message)
         }
     }
 
     async fetchData() {
+        try {
         let dbOffset = 0;
-
         while (true) {
             const ids = await cgModel.CGListModel.aggregate([
                 { $skip: dbOffset },
@@ -56,6 +56,7 @@ class CGCoinPricesCron {
                 { $group: { _id: null, ids: { $addToSet: "$id" } } },
             ]);
 
+            console.log(ids.length, dbOffset)
             if (ids.length < 1) {
                 break;
             }
@@ -64,7 +65,6 @@ class CGCoinPricesCron {
                 break;
             }
 
-            // TODO: Add type for coinPrices returned data
             const coinsData = ids[0].ids
             const coinPricesData = await cgApi.coinPrices(coinsData);
 
@@ -76,11 +76,12 @@ class CGCoinPricesCron {
             logger.info(dbOffset)
             dbOffset += coinsData.length;
         }
-
-        return;
+    } catch (error: any) {
+        logger.error(error.message)
+    }
     }
 }
 
-const cgCoinPricesCron = new CGCoinPricesCron();
+const cgCoinPricesCron = new CGCoinPricesCron()
 
 export default cgCoinPricesCron;
