@@ -119,12 +119,12 @@ class CoingeckoApi {
         }
     }
 
-    async coinPrices(coin_ids: string[], vs_currencies: string[]) {
+    async coinPrices(coin_ids: string[]) {
         const url = `/simple/price`;
 
         const params = {
             ids: coin_ids.join(','),
-            vs_currencies: vs_currencies.join(','),
+            vs_currencies: 'usd',
             include_market_cap: true,
             include_24hr_vol: false,
             include_24hr_change: false,
