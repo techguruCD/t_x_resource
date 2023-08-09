@@ -9,7 +9,7 @@ const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
 class CGCoinInfoCron {
-    private cronExpression = '0 */6 * * *' // every 6 hours
+    private cronExpression = '0 */2 * * *' // every 2 hours
     cron = cron.schedule(this.cronExpression, async () => {
         await this.fetchData();
     }, { scheduled: false });
@@ -23,15 +23,10 @@ class CGCoinInfoCron {
         }
     }
 
-    async fetchData() {
+    private async fetchData() {
         const ids = await cgModel.CGListModel.aggregate([
             { $sort: { market_cap: 1 } },
-            {
-                $group: {
-                _id: null,
-                ids: { $push: "$id" },
-                },
-            },
+            { $group: { _id: null, ids: { $push: "$id" } } },
         ]);
 
         if (ids.length < 1) {

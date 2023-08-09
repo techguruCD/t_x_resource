@@ -34,32 +34,7 @@ class BitqueryApi {
         }
     }
 
-    async listCoins(network: string, limit = 500, offset = 0, from?: string, till?: string, networkQueryString = "ethereum") {
-        try {
-            if (!from) {
-                from = moment.utc().subtract(1, "days").format("YYYY-MM-DD");
-            }
-
-            if (!till) {
-                till = moment.utc().format("YYYY-MM-DD");
-            }
-
-            const query = bqQueries.fetchTokens(network, limit, offset, from, till, networkQueryString);
-            const data = await this.axios.post('', { query, variables: {} });
-            const transfers = data?.data?.data?.[networkQueryString]?.transfers;
-
-            if (transfers && Array.isArray(transfers) && transfers.length > 0) {
-                return transfers;
-            }
-
-            return [];
-        } catch (error: any) {
-            this.logError(error)
-            return [];
-        }
-    }
-
-    async listPairs(network: string, baseCurrency: string[], limit = 500, offset = 0, from?: string, till?: string, networkQueryString = "ethereum") {
+    async listPairs(network: string, limit = 500, offset = 0, from?: string, till?: string, networkQueryString = "ethereum") {
         try {
             if (!from) {
                 from = moment.utc().subtract(1, "days").format("YYYY-MM-DD");
@@ -70,40 +45,9 @@ class BitqueryApi {
             }
 
             await delayExecution(1000);
-            const query = bqQueries.fetchPairs(network, baseCurrency, limit, offset, from, till, networkQueryString);
+            const query = bqQueries.fetchPairs(network, limit, offset, from, till, networkQueryString);
             const response = await this.axios.post('', { query, variables: {} });
             this.logger.info(`listPairs api call status ${response.status}`);
-            const dexTrades = response?.data?.data?.[networkQueryString]?.dexTrades;
-
-            if (dexTrades && Array.isArray(dexTrades) && dexTrades.length > 0) {
-                return dexTrades;
-            }
-
-            return [];
-        } catch (error) {
-            if (isAxiosError(error)) {
-                this.logError(`listPairs api call status ${error.response?.status}`);
-                return [];
-            }
-            this.logError(error)
-            return [];
-        }
-    }
-
-    async listPairs2(network: string, limit = 500, offset = 0, from?: string, till?: string, networkQueryString = "ethereum") {
-        try {
-            if (!from) {
-                from = moment.utc().subtract(1, "days").format("YYYY-MM-DD");
-            }
-
-            if (!till) {
-                till = moment.utc().format("YYYY-MM-DD");
-            }
-
-            await delayExecution(1000);
-            const query = bqQueries.fetchPairs2(network, limit, offset, from, till, networkQueryString);
-            const response = await this.axios.post('', { query, variables: {} });
-            this.logger.info(`listPairs2 api call status ${response.status}`);
             const dexTrades = response?.data?.data?.[networkQueryString]?.dexTrades;
 
             if (dexTrades && Array.isArray(dexTrades) && dexTrades.length > 0) {

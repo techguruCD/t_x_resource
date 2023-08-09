@@ -71,7 +71,7 @@ const tickersSchema = new Schema({
         ref: 'CGList'
     },
     name: String,
-    tickers: Schema.Types.Mixed
+    tickers: [Schema.Types.Mixed]
 });
 
 const CGListModel = model('CGList', cgListSchema, 'CGList');

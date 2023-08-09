@@ -1,38 +1,17 @@
-import cron from 'node-cron';
+import moment from 'moment';
 import axiosUtil from "../utils/axios.util";
 import BitqueryApi from "../utils/bitquery.util";
+import delayExecution from '../utils/executionDelay.utils';
 import loggersUtil from "../utils/loggers.util";
 import bqModel from './bq.model';
-import moment from 'moment';
 
 const axios = axiosUtil.bitqueryAxios;
 const logger = loggersUtil.bitqueryLogger;
 const bitqueryApi = new BitqueryApi(axios, logger);
 
-class BQPairsCron {
-    private cronExpression = "*/2 * * * *";
+class BQPairs {
     private networkQueryString: string;
     private network: string;
-
-    private bitqueryDexToolsMap = new Map<string, string | null>([
-        ["ethereum", "ether"],
-        ["bsc", "bsc"],
-        ["matic", "polygon"],
-        ["avalanche", "avalanche"],
-        ["cronos", "cronos"],
-        ["ethclassic", "etc"],
-        ["celo_mainnet", "celo"],
-        ["conflux_hydra", "conflux"],
-        ["velas", "velas"],
-        ["klaytn", "klaytn"],
-        ["algorand", "algorand"],
-        ["eos", null],
-        ["tron", null],
-    ]);
-
-    cron = cron.schedule(this.cronExpression, async () => {
-        await this.fetchData();
-    }, { scheduled: false });
 
     constructor(network: string, networkQueryString = 'ethereum') {
         this.network = network;
@@ -48,13 +27,7 @@ class BQPairsCron {
                     "buyCurrency.address": pair.buyCurrency.address,
                     "sellCurrency.address": pair.sellCurrency.address
                 },
-                update: {
-                    $set: {
-                        network: this.network,
-                        dexToolSlug: this.bitqueryDexToolsMap.get(this.network),
-                        ...pair
-                    }
-                },
+                update: { $set: { network: this.network, ...pair } },
                 upsert: true
             }
         }));
@@ -63,15 +36,15 @@ class BQPairsCron {
         logger.info(`Total ${list.length}, Inserted ${writeResult.insertedCount}, Upserted ${writeResult.upsertedCount}, Modified ${writeResult.modifiedCount}`);
     }
 
-    async fetchData() {
-        const from = moment.utc("2023-07-20").subtract(1, "days").format("YYYY-MM-DD");
+    async syncData() {
+        const from = moment.utc().subtract(1, "days").format("YYYY-MM-DD");
         const till = moment.utc().format("YYYY-MM-DD");
 
         let offset = 0;
         
         while (true) {
             logger.info(`fetching ${this.network} pairs with offset ${offset}`);
-            const data = await bitqueryApi.listPairs2(this.network, 1000, offset, from, till, this.networkQueryString);
+            const data = await bitqueryApi.listPairs(this.network, 10000, offset, from, till, this.networkQueryString);
             
             if (data.length < 1) {
                 logger.info(`no more data for pairs on ${this.network}`);
@@ -81,31 +54,35 @@ class BQPairsCron {
             this.upsertData(data);
             offset = offset + data.length;
         }
+        
+        logger.info('bqPairs cooling down for 10 seconds');
+        await delayExecution(10000)
+        this.syncData();
     }
 }
 
-const bqEthPairsCron = new BQPairsCron('ethereum');
-const bqBscPairsCron = new BQPairsCron('bsc');
-const bqMaticPairsCron = new BQPairsCron('matic');
-const bqVelasPairsCron = new BQPairsCron('velas');
-const bqKlaytnPairsCron = new BQPairsCron('klaytn');
-const bqAvalanchePairsCron = new BQPairsCron('avalanche');
-const bqFantomPairsCron = new BQPairsCron('fantom');
-const bqMoonbeamPairsCron = new BQPairsCron('moonbeam');
-const bqCronosPairsCron = new BQPairsCron('cronos');
-const bqCeloMainnetPairsCron = new BQPairsCron('celo_mainnet');
+const bqEthPairs = new BQPairs('ethereum');
+const bqBscPairs = new BQPairs('bsc');
+const bqMaticPairs = new BQPairs('matic');
+const bqVelasPairs = new BQPairs('velas');
+const bqKlaytnPairs = new BQPairs('klaytn');
+const bqAvalanchePairs = new BQPairs('avalanche');
+const bqFantomPairs = new BQPairs('fantom');
+const bqMoonbeamPairs = new BQPairs('moonbeam');
+const bqCronosPairs = new BQPairs('cronos');
+const bqCeloMainnetPairs = new BQPairs('celo_mainnet');
 
-const bqPairs2Cron = {
-    bqEthPairsCron,
-    bqBscPairsCron,
-    bqMaticPairsCron,
-    bqVelasPairsCron,
-    bqKlaytnPairsCron,
-    bqAvalanchePairsCron,
-    bqFantomPairsCron,
-    bqMoonbeamPairsCron,
-    bqCronosPairsCron,
-    bqCeloMainnetPairsCron
+const bqPairsCron = {
+    bqEthPairs,
+    bqBscPairs,
+    bqMaticPairs,
+    bqVelasPairs,
+    bqKlaytnPairs,
+    bqAvalanchePairs,
+    bqFantomPairs,
+    bqMoonbeamPairs,
+    bqCronosPairs,
+    bqCeloMainnetPairs
 }
 
-export default bqPairs2Cron;
+export default bqPairsCron;

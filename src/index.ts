@@ -5,11 +5,8 @@ import loggersUtil from './utils/loggers.util';
 import mongoose from 'mongoose';
 import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
 // import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
-// import cmcCoinListCron from './cmc-scripts/coinList.cron';
-// import cmcMetadataCron from './cmc-scripts/metadata.cron';
-// import bqCoinsCron from './biquery-scripts/bqCoins.cron';
-// import bqPairsCron from './biquery-scripts/bqPairs.cron';
-// import cgCoinListCron from './cg-scripts/coinList.cron';
+import bqPairsCron from './biquery-scripts/bqPairs.cron';
+import cgCoinListCron from './cg-scripts/coinList.cron';
 
 
 if (!process.env['DB_URI']) {
@@ -36,38 +33,20 @@ if (!process.env['CW_API_KEY']) {
 
         loggersUtil.mainLogger.info(`connected to ${db.connection.db.databaseName}`);
 
-        // cmcCoinListCron.cron.start();
-        // cmcMetadataCron.cron.start();
-        // bqCoinsCron.bqEthCoinsCron.start();
-        // bqCoinsCron.bqMaticCoinsCron.start();
-        // bqCoinsCron.bqBscCoinsCron.start();
-        // bqCoinsCron.bqVelasCoinsCron.start();
-        // bqCoinsCron.bqKlaytnCoinsCron.start();
-        // bqCoinsCron.bqAvalancheCoinsCron.start();
-        // bqCoinsCron.bqFantomCoinsCron.start();
-        // bqCoinsCron.bqMoonbeamCoinsCron.start();
-        // bqCoinsCron.bqCronosCoinsCron.start();
-        // bqCoinsCron.bqEthClassicCoinsCron.start();
-        // bqCoinsCron.bqCeloCoinsCron.start();
-        // bqCoinsCron.bqConfluxCoinsCron.start();
-        // bqCoinsCron.bqEosCoinsCron.start();
-        // bqCoinsCron.bqTronCoinsCron.start();
-        // bqCoinsCron.bqAlgorandCoinsCron.start();
 
+        bqPairsCron.bqEthPairs.syncData(),
+        bqPairsCron.bqBscPairs.syncData(),
+        bqPairsCron.bqMaticPairs.syncData(),
+        bqPairsCron.bqVelasPairs.syncData();
+        bqPairsCron.bqKlaytnPairs.syncData();
+        bqPairsCron.bqAvalanchePairs.syncData();
+        bqPairsCron.bqFantomPairs.syncData();
+        bqPairsCron.bqMoonbeamPairs.syncData();
+        bqPairsCron.bqCronosPairs.syncData();
+        bqPairsCron.bqCeloMainnetPairs.syncData();
 
-        // bqPairsCron.bqEthPairsCron.fetchData()//.cron.start(),
-        // bqPairsCron.bqBscPairsCron.fetchData()//.cron.start(),
-        // bqPairsCron.bqMaticPairsCron.fetchData()//.cron.start(),
-        // bqPairsCron.bqVelasPairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqKlaytnPairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqAvalanchePairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqFantomPairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqMoonbeamPairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqCronosPairsCron.fetchData()//.cron.start();
-        // bqPairsCron.bqCeloMainnetPairsCron.fetchData()//.cron.start();
-
-        // await cgCoinListCron.cron.start();
-        await cgCoinInfoCron.fetchData();
+        cgCoinListCron.cron.start();
+        cgCoinInfoCron.cron.start();
         // await cgCoinTickersCron.fetchData();
 
     } catch (error: any) {

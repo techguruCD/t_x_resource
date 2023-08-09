@@ -14,18 +14,11 @@ class CGCoinTickersCron {
         await this.fetchData();
     }, { scheduled: false });
 
-    private async upsertData(coinId: string, data: any) {
-        try {
-            await cgModel.CGTickersModel.updateOne({ id: coinId }, { $set: data }, { upsert: true });
-        } catch (error: any) {
-            logger.error(error.message)
-        }
-    }
-
     async fetchData() {
         let dbOffset = 0;
 
         while (true) {
+            logger.info(`CGListModel offset ${dbOffset}`);
             const ids = await cgModel.CGListModel.aggregate([
                 { $sort: { market_cap: -1 } },
                 { $skip: dbOffset },
@@ -41,26 +34,34 @@ class CGCoinTickersCron {
                 break;
             }
 
-            for (const id of ids) {
+            for (const id of ids[0].ids) {
                 let tickersPage = 1;
+                
+                logger.info(`tickersPage ${tickersPage}, id: ${id}`);
                 while (true) {
                     const coinTickers = await cgApi.coinTickers(id, tickersPage);
+                    console.log(`1`, coinTickers);
 
                     if (!coinTickers) {
-                        continue;
+                        break;
                     }
 
-                    if (coinTickers.tickers.length < 0) {
-                        continue;
+                    if (coinTickers.tickers.length < 1) {
+                        break;
                     }
-                    this.upsertData(id, coinTickers);
+
+                    if (tickersPage === 1) {
+                        await cgModel.CGTickersModel.updateOne({ id }, { $set: { id, name: coinTickers.name, tickers: coinTickers.tickers } }, { upsert: true });
+                    } else {
+                        await cgModel.CGTickersModel.updateOne({ id }, { $push: { tickers: coinTickers.tickers }} );
+                    }
+
                     tickersPage += 1;
                 }
             }
 
             dbOffset += ids[0].ids.length;
         }
-        return;
     }
 }
 

@@ -1,101 +1,4 @@
-function fetchTokens(network: string, limit: number, offset: number, from: string, till: string, networkQueryString = "ethereum") {
-    let count = 'count'
-    let amount = 'amount'
-    let amount_usd = 'amount(in: USD)'
-
-    if (networkQueryString === 'algorand') {
-        count = 'count(transferType: {in: [send, close]})'
-        amount = 'amount(transferType: {notIn: [create, genesis]})'
-        amount_usd = 'amount(in: USD, transferType: {notIn: [create, genesis]})'
-    }
-
-
-
-    const query = `{
-        ${networkQueryString}(network: ${network}) {
-            transfers(
-            options: {desc: "count", limit: ${limit}, offset: ${offset}}
-            amount: {gt: 0}
-            date: {since: "${from}", till: "${till}"}
-            ) {
-            currency {
-                address,
-                decimals
-                name
-                symbol
-                tokenId
-                tokenType
-            }
-            ${count}
-            senders: count(uniq: senders)
-            receivers: count(uniq: receivers)
-            days: count(uniq: dates)
-            from_date: minimum(of: date)
-            till_date: maximum(of: date)
-            ${amount}
-            amount_usd: ${amount_usd}
-            }
-        }
-    }`;
-
-    return query;
-}
-
-function fetchPairs(network: string, baseCurrencies: string[], limit: number, offset: number, from: string, till: string, networkQueryString = 'ethereum') {
-  const baseCurrenciesString = JSON.stringify(baseCurrencies);
-  
-    const query = `{
-  ${networkQueryString}(network: ${network}) {
-    dexTrades(
-      baseCurrency: {in: ${baseCurrenciesString}}
-      options: {desc: "count", limit: ${limit}, offset: ${offset}, limitBy: {each: "smartContract.address.address", limit: 1}}
-      date: {since: "${from}", till: "${till}"}
-    ) {
-      date {
-        date
-      }
-      exchange {
-        address {
-          address
-        }
-        fullName
-        fullNameWithId
-        name
-      }
-      baseCurrency {
-        address
-      }
-      quoteCurrency {
-        address
-        decimals
-        name
-        symbol
-        tokenId
-        tokenType
-      }
-      smartContract {
-        address {
-          address
-        }
-        currency {
-          decimals
-          name
-          symbol
-          tokenType
-        }
-        contractType
-        protocolType
-      }
-      count
-    }
-  }
-}
-    `;
-
-    return query;
-}
-
-function fetchPairs2(network: string, limit: number, offset: number, from: string, till: string, networkQueryString = 'ethereum') {
+function fetchPairs(network: string, limit: number, offset: number, from: string, till: string, networkQueryString = 'ethereum') {
   const query = `{
   ${networkQueryString}(network: ${network}) {
     dexTrades(
@@ -158,9 +61,7 @@ function fetchPairs2(network: string, limit: number, offset: number, from: strin
 }
 
 const bqQueries = {
-    fetchTokens,
-    fetchPairs,
-    fetchPairs2
+    fetchPairs
 };
 
 export default bqQueries;
