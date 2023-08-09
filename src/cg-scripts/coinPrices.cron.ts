@@ -1,19 +1,15 @@
-import cron from 'node-cron';
 import axiosUtil from '../utils/axios.util';
-import loggersUtil from '../utils/loggers.util';
 import CoingeckoApi from '../utils/coingecko.utils';
+import delayExecution from '../utils/executionDelay.utils';
+import loggersUtil from '../utils/loggers.util';
 import cgModel from './cgModel';
 
 const axios = axiosUtil.coingeckoAxios;
 const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
-class CGCoinPricesCron {
-    private cronExpression = '* 1 * * * *' // every 12 hours
-    cron = cron.schedule(this.cronExpression, async () => {
-        await this.fetchData();
-    }, { scheduled: false });
-
+class CGCoinPrices {
+    
     private async upsertData(data: any) {
         try {
             const coinIds = Object.keys(data)
@@ -21,67 +17,75 @@ class CGCoinPricesCron {
 
             coinIds.forEach((coinId) => {
                 const coinData = data[coinId]
-                const condition = { id: coinData.id }
-                const coinDataUpdateOperation = {
-                    $set: {
-                        current_price: coinData.usd,
-                        market_cap: coinData.usd_market_cap,
-                        last_updated: coinData.last_updated_at
-                    }
-                }
 
                 bulkWriteOperations.push({
                     updateOne: {
-                        filter: condition,
-                        update: coinDataUpdateOperation
+                        filter: { id: coinId },
+                        update: {
+                            $set: {
+                                current_price: coinData.usd,
+                                market_cap: coinData.usd_market_cap,
+                                last_updated: coinData.last_updated_at
+                            }
+                        }
                     }
-                })
-            })
+                });
+            });
 
-            await cgModel.CGListModel.bulkWrite(bulkWriteOperations)
-
-            logger.info(`Updated prices data for ${coinIds.length} coins`)
+            if (bulkWriteOperations.length > 0) {
+                await cgModel.CGListModel.bulkWrite(bulkWriteOperations);
+                logger.info(`Updated coinPrices data for ${coinIds.length} coins`);
+            } else {
+                logger.info(`No coinPrices data to update`);
+            }
         } catch (error: any) {
             logger.error(error.message)
         }
     }
 
-    async fetchData() {
+    async syncData() {
         try {
-        let dbOffset = 0;
-        while (true) {
-            const ids = await cgModel.CGListModel.aggregate([
-                { $skip: dbOffset },
-                { $limit: 250 },
-                { $group: { _id: null, ids: { $addToSet: "$id" } } },
-            ]);
+            let dbOffset = 0;
 
-            console.log(ids.length, dbOffset)
-            if (ids.length < 1) {
-                break;
+            while (true) {
+                logger.info(`fetching coinPrices pairs with offset ${dbOffset}`);
+                const ids = await cgModel.CGListModel.aggregate([
+                    { $sort: { id: 1 } },
+                    { $skip: dbOffset },
+                    { $limit: 500 },
+                    { $group: { _id: null, ids: { $push: "$id" } } },
+                ]);
+
+                if (ids.length < 1) {
+                    logger.info(`no more data for coinPrices`);
+                    break;
+                }
+
+                if (ids[0].ids.length < 1) {
+                    logger.info(`no more data for coinPrices`);
+                    break;
+                }
+
+                const coinsData = ids[0].ids
+                const coinPricesData = await cgApi.coinPrices(coinsData);
+
+                if (!coinPricesData) {
+                    continue;
+                }
+
+                this.upsertData(coinPricesData);
+                dbOffset += coinsData.length;
             }
 
-            if (ids[0].ids.length < 1) {
-                break;
-            }
-
-            const coinsData = ids[0].ids
-            const coinPricesData = await cgApi.coinPrices(coinsData);
-
-            if (!coinPricesData) {
-                continue;
-            }
-
-            this.upsertData(coinPricesData);
-            logger.info(dbOffset)
-            dbOffset += coinsData.length;
+            logger.info(`pairsPrices cooling down for 10 seconds`);
+            await delayExecution(10000);
+            this.syncData();
+        } catch (error: any) {
+            logger.error(error.message)
         }
-    } catch (error: any) {
-        logger.error(error.message)
-    }
     }
 }
 
-const cgCoinPricesCron = new CGCoinPricesCron()
+const cgCoinPrices = new CGCoinPrices()
 
-export default cgCoinPricesCron;
+export default cgCoinPrices;

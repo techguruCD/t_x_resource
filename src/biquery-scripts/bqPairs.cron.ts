@@ -72,7 +72,7 @@ const bqMoonbeamPairs = new BQPairs('moonbeam');
 const bqCronosPairs = new BQPairs('cronos');
 const bqCeloMainnetPairs = new BQPairs('celo_mainnet');
 
-const bqPairsCron = {
+const bqPairs = {
     bqEthPairs,
     bqBscPairs,
     bqMaticPairs,
@@ -85,4 +85,4 @@ const bqPairsCron = {
     bqCeloMainnetPairs
 }
 
-export default bqPairsCron;
+export default bqPairs;

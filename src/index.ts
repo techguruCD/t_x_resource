@@ -5,8 +5,9 @@ import loggersUtil from './utils/loggers.util';
 import mongoose from 'mongoose';
 import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
 // import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
-import bqPairsCron from './biquery-scripts/bqPairs.cron';
+import bqPairs from './biquery-scripts/bqPairs.cron';
 import cgCoinListCron from './cg-scripts/coinList.cron';
+import cgCoinPrices from './cg-scripts/coinPrices.cron';
 
 
 if (!process.env['DB_URI']) {
@@ -34,17 +35,18 @@ if (!process.env['CW_API_KEY']) {
         loggersUtil.mainLogger.info(`connected to ${db.connection.db.databaseName}`);
 
 
-        bqPairsCron.bqEthPairs.syncData(),
-        bqPairsCron.bqBscPairs.syncData(),
-        bqPairsCron.bqMaticPairs.syncData(),
-        bqPairsCron.bqVelasPairs.syncData();
-        bqPairsCron.bqKlaytnPairs.syncData();
-        bqPairsCron.bqAvalanchePairs.syncData();
-        bqPairsCron.bqFantomPairs.syncData();
-        bqPairsCron.bqMoonbeamPairs.syncData();
-        bqPairsCron.bqCronosPairs.syncData();
-        bqPairsCron.bqCeloMainnetPairs.syncData();
+        bqPairs.bqEthPairs.syncData();
+        bqPairs.bqBscPairs.syncData();
+        bqPairs.bqMaticPairs.syncData();
+        bqPairs.bqVelasPairs.syncData();
+        bqPairs.bqKlaytnPairs.syncData();
+        bqPairs.bqAvalanchePairs.syncData();
+        bqPairs.bqFantomPairs.syncData();
+        bqPairs.bqMoonbeamPairs.syncData();
+        bqPairs.bqCronosPairs.syncData();
+        bqPairs.bqCeloMainnetPairs.syncData();
 
+        cgCoinPrices.syncData();
         cgCoinListCron.cron.start();
         cgCoinInfoCron.cron.start();
         // await cgCoinTickersCron.fetchData();
@@ -53,4 +55,4 @@ if (!process.env['CW_API_KEY']) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);
         process.exit(1);
     }
-})()
+})();
