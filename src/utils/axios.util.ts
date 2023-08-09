@@ -10,12 +10,9 @@ class Axios {
 }
 
 const axiosUtil = {
-    coinmarketcapAxios: new Axios(config.coinmarketcapUrl, config.coinmarketcapHeaders).axiosInstance,
     coingeckoAxios: new Axios(config.coingeckoUrl, config.coingeckoHeaders).axiosInstance,
-    coinpaprikaAxios: new Axios(config.coinpaprikaUrl, config.coinpaprikaHeaders).axiosInstance,
     cryptowatchAxios: new Axios(config.cryptowatchUrl, config.cryptowatchHeaders).axiosInstance,
     bitqueryAxios: new Axios(config.bitqueryUrl, config.bitqueryHeader).axiosInstance,
-    dextoolsAxios: new Axios(config.dexToolsUrl, config.dexToolsHeaders).axiosInstance
 }
 
 export default axiosUtil;
