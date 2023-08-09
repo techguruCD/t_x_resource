@@ -33,7 +33,7 @@ class BQPairs {
         }));
 
         const writeResult = await bqModel.BQPairModel.bulkWrite(pairs as any[]);
-        logger.info(`Total ${list.length}, Inserted ${writeResult.insertedCount}, Upserted ${writeResult.upsertedCount}, Modified ${writeResult.modifiedCount}`);
+        logger.info(`Network ${this.network}, Total ${list.length}, Inserted ${writeResult.insertedCount}, Upserted ${writeResult.upsertedCount}, Modified ${writeResult.modifiedCount}`);
     }
 
     async syncData() {
@@ -55,8 +55,8 @@ class BQPairs {
             offset = offset + data.length;
         }
         
-        logger.info('bqPairs cooling down for 10 seconds');
-        await delayExecution(10000)
+        logger.info(`bqPairs for network ${this.network} cooling down for 1 minute`);
+        await delayExecution(60000)
         this.syncData();
     }
 }

@@ -30,7 +30,7 @@ class BitqueryApi {
 
             this.logger.error(message);
         } else {
-            this.logger.error(error.message ? JSON.stringify({ message: error.message }) : "Something went wrong");
+            this.logger.error(error.message ? JSON.stringify({ error }) : "Something went wrong");
         }
     }
 
@@ -47,7 +47,7 @@ class BitqueryApi {
             await delayExecution(1000);
             const query = bqQueries.fetchPairs(network, limit, offset, from, till, networkQueryString);
             const response = await this.axios.post('', { query, variables: {} });
-            this.logger.info(`listPairs api call status ${response.status}`);
+            this.logger.info(`listPairs api call status ${response.status} for ${network}`);
             const dexTrades = response?.data?.data?.[networkQueryString]?.dexTrades;
 
             if (dexTrades && Array.isArray(dexTrades) && dexTrades.length > 0) {
@@ -57,7 +57,7 @@ class BitqueryApi {
             return [];
         } catch (error) {
             if (isAxiosError(error)) {
-                this.logError(`listPairs2 api call status ${error.response?.status}`);
+                this.logError(`listPairs api call status ${error.response?.status}`);
                 return [];
             }
             this.logError(error)
