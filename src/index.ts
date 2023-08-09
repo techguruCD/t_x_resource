@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import loggersUtil from './utils/loggers.util';
 import mongoose from 'mongoose';
 import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
+import loggersUtil from './utils/loggers.util';
 // import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
 import bqPairs from './biquery-scripts/bqPairs.cron';
 import cgCoinListCron from './cg-scripts/coinList.cron';
