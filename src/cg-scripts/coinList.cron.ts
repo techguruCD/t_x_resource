@@ -30,7 +30,7 @@ class CGCoinListCron {
         }
     }
 
-    private async fetchData() {
+    async fetchData() {
         let start = 0;
 
         while (true) {
@@ -43,7 +43,6 @@ class CGCoinListCron {
 
             this.upsertData(data);
             start += 1;
-            break;
         }
     }
 }
