@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import mongoose from 'mongoose';
-import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
+// import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
 import loggersUtil from './utils/loggers.util';
 // import cgCoinTickersCron from './cg-scripts/coinTickers.cron';
-import bqPairs from './biquery-scripts/bqPairs.cron';
+// import bqPairs from './biquery-scripts/bqPairs.cron';
 import cgCoinListCron from './cg-scripts/coinList.cron';
 import cgCoinPrices from './cg-scripts/coinPrices.cron';
 
@@ -35,20 +35,20 @@ if (!process.env['CW_API_KEY']) {
         loggersUtil.mainLogger.info(`connected to ${db.connection.db.databaseName}`);
 
 
-        bqPairs.bqEthPairs.syncData();
-        bqPairs.bqBscPairs.syncData();
-        bqPairs.bqMaticPairs.syncData();
-        bqPairs.bqVelasPairs.syncData();
-        bqPairs.bqKlaytnPairs.syncData();
-        bqPairs.bqAvalanchePairs.syncData();
-        bqPairs.bqFantomPairs.syncData();
-        bqPairs.bqMoonbeamPairs.syncData();
-        bqPairs.bqCronosPairs.syncData();
-        bqPairs.bqCeloMainnetPairs.syncData();
+        // bqPairs.bqEthPairs.syncData();
+        // bqPairs.bqBscPairs.syncData();
+        // bqPairs.bqMaticPairs.syncData();
+        // bqPairs.bqVelasPairs.syncData();
+        // bqPairs.bqKlaytnPairs.syncData();
+        // bqPairs.bqAvalanchePairs.syncData();
+        // bqPairs.bqFantomPairs.syncData();
+        // bqPairs.bqMoonbeamPairs.syncData();
+        // bqPairs.bqCronosPairs.syncData();
+        // bqPairs.bqCeloMainnetPairs.syncData();
 
         cgCoinPrices.syncData();
         cgCoinListCron.cron.start();
-        cgCoinInfoCron.cron.start();
+        // cgCoinInfoCron.cron.start();
         // await cgCoinTickersCron.fetchData();
 
     } catch (error: any) {
