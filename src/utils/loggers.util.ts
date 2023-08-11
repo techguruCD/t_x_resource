@@ -78,17 +78,13 @@ class Logger {
 }
 
 const mainLogger = new Logger('main-service', 'main-errors', 'main-combined').logger;
-const cmcLogger = new Logger('cmc-service', 'cmc-errors', 'cmc-combined').logger;
 const cgLogger = new Logger('cg-service', 'cg-errors', 'cg-combined').logger;
 const bitqueryLogger = new Logger('bitquery-service', 'bitquery-errors', 'bitquery-combined').logger;
-const dexToolsLogger = new Logger('dextools-service', 'dextools-errors', 'dextools-combined').logger;
 
 const loggersUtil = {
     mainLogger,
-    cmcLogger,
     cgLogger,
     bitqueryLogger,
-    dexToolsLogger
 }
 
 export default loggersUtil;
