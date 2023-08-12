@@ -34,16 +34,16 @@ if (!process.env['CW_API_KEY']) {
         loggersUtil.mainLogger.info(`connected to ${db.connection.db.databaseName}`);
 
 
-        bqPairs.bqEthPairs.syncData();
-        bqPairs.bqBscPairs.syncData();
-        bqPairs.bqMaticPairs.syncData();
-        bqPairs.bqVelasPairs.syncData();
-        bqPairs.bqKlaytnPairs.syncData();
-        bqPairs.bqAvalanchePairs.syncData();
-        bqPairs.bqFantomPairs.syncData();
-        bqPairs.bqMoonbeamPairs.syncData();
-        bqPairs.bqCronosPairs.syncData();
-        bqPairs.bqCeloMainnetPairs.syncData();
+        bqPairs.bqEthPairs.start();
+        bqPairs.bqBscPairs.start();
+        bqPairs.bqMaticPairs.start();
+        bqPairs.bqVelasPairs.start();
+        bqPairs.bqKlaytnPairs.start();
+        bqPairs.bqAvalanchePairs.start();
+        bqPairs.bqFantomPairs.start();
+        bqPairs.bqMoonbeamPairs.start();
+        bqPairs.bqCronosPairs.start();
+        bqPairs.bqCeloMainnetPairs.start();
 
         cgCoinPrices.syncData();
         cgCoinIdsCron.cron.start();
