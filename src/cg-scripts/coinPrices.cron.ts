@@ -33,7 +33,7 @@ class CGCoinPrices {
             });
 
             if (bulkWriteOperations.length > 0) {
-                await cgModel.CGListModel.bulkWrite(bulkWriteOperations);
+                await cgModel.CGCoinInfoModel.bulkWrite(bulkWriteOperations);
                 logger.info(`Updated coinPrices data for ${coinIds.length} coins`);
             } else {
                 logger.info(`No coinPrices data to update`);
@@ -49,7 +49,7 @@ class CGCoinPrices {
 
             while (true) {
                 logger.info(`fetching coinPrices pairs with offset ${dbOffset}`);
-                const ids = await cgModel.CGListModel.aggregate([
+                const ids = await cgModel.CGIdsModel.aggregate([
                     { $sort: { id: 1 } },
                     { $skip: dbOffset },
                     { $limit: 500 },
@@ -77,8 +77,8 @@ class CGCoinPrices {
                 dbOffset += coinsData.length;
             }
 
-            logger.info(`pairsPrices cooling down for 10 seconds`);
-            await delayExecution(10000);
+            logger.info(`pairsPrices cooling down for 20 seconds`);
+            await delayExecution(20000);
             this.syncData();
         } catch (error: any) {
             logger.error(error.message)

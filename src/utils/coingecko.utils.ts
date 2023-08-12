@@ -1,5 +1,6 @@
 import { AxiosInstance, isAxiosError } from "axios";
 import winston from "winston";
+import cgModel from "../cg-scripts/cgModel";
 // import delayExecution from "./executionDelay.utils";
 
 class CoingeckoApi {
@@ -21,20 +22,10 @@ class CoingeckoApi {
         this.logger.error(message);
     }
 
-    async coinsList(page: number) {
-        const url = `/coins/markets`;
-        const params = {
-            vs_currency: 'usd',
-            order: 'market_cap_desc',
-            per_page: '250',
-            sparkline: false,
-            price_change_percentage: '1h',
-            locale: 'en',
-            page,
-        };
-
+    async coinIds() {
+        const url = `/coins/list`;
         try {
-            const response = await this.axios.get(url, { params });
+            const response = await this.axios.get(url);
 
             if (!response.data) {
                 return undefined;
@@ -50,7 +41,7 @@ class CoingeckoApi {
 
             return response.data;
         } catch (error: any) {
-            this.logError(error, JSON.stringify({ url, params }));
+            this.logError(error, JSON.stringify({ url }));
             return undefined;
         }
     }
@@ -60,7 +51,7 @@ class CoingeckoApi {
         const params = {
             localization: 'en',
             tickers: 'false',
-            market_data: 'false',
+            market_data: 'true',
             community_data: 'false',
             developer_data: 'false',
             sparkline: 'false'
@@ -76,6 +67,10 @@ class CoingeckoApi {
 
             return response.data;
         } catch (error: any) {
+            if (isAxiosError(error) && error.response?.data?.error === 'coin not found') {
+                cgModel.CGCoinInfoModel.deleteOne({ id: coin_id });
+                return undefined;
+            }
             this.logError(error, JSON.stringify({ url, params }));
             return undefined;
         }
@@ -85,25 +80,6 @@ class CoingeckoApi {
         const url = `/coins/${coin_id}/tickers`
 
         const params = { include_exchange_logo: true, page };
-
-        try {
-            const response = await this.axios.get(url, { params });
-
-            if (!response.data) {
-                return undefined;
-            }
-
-            return response.data;
-        } catch (error: any) {
-            this.logError(error, JSON.stringify({ url, params }))
-            return undefined
-        }
-    }
-
-    async coinChart(coin_id: string) {
-        const url = `/coins/${coin_id}/market_chart`;
-
-        const params = { vs_currency: 'usd', days: 30, interval: 'daily' };
 
         try {
             const response = await this.axios.get(url, { params });

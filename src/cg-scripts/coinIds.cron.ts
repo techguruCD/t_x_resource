@@ -1,22 +1,22 @@
 import cron from 'node-cron';
 import axiosUtil from '../utils/axios.util';
-import loggersUtil from '../utils/loggers.util';
 import CoingeckoApi from '../utils/coingecko.utils';
+import loggersUtil from '../utils/loggers.util';
 import cgModel from './cgModel';
 
 const axios = axiosUtil.coingeckoAxios;
 const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
-class CGCoinListCron {
-    private cronExpression = '0 * * * *' // every 1 hour
+class CGCoinsIdsCron {
+    private cronExpression = '0 * * * *' // every hour
     cron = cron.schedule(this.cronExpression, async () => {
         await this.fetchData();
     }, { scheduled: false });
 
     private async upsertData(data: any[]) {
         try {
-            await cgModel.CGListModel.bulkWrite(
+            await cgModel.CGIdsModel.bulkWrite(
                 data.map((coin: any) => ({
                     updateOne: {
                         filter: { id: coin.id },
@@ -25,28 +25,25 @@ class CGCoinListCron {
                     }
                 }))
             );
+
+            logger.info('upserted CGIds data')
         } catch (error: any) {
             logger.error(error.message)
         }
     }
 
-    async fetchData() {
-        let start = 0;
+    private async fetchData() {
+        logger.info(`fetching CGCoinIds data`);
+        const coinIdsData = await cgApi.coinIds();
 
-        while (true) {
-            logger.info(`fetching cgCoinList from ${start}`);
-            const data = await cgApi.coinsList(start);
-
-            if (!data) {
-                break;
-            }
-
-            this.upsertData(data);
-            start += 1;
+        if (!coinIdsData) {
+            return undefined
         }
+
+        this.upsertData(coinIdsData);
     }
 }
 
-const cgCoinListCron = new CGCoinListCron();
+const cgCoinIdsCron = new CGCoinsIdsCron();
 
-export default cgCoinListCron;
+export default cgCoinIdsCron;

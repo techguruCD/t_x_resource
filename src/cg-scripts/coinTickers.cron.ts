@@ -19,11 +19,9 @@ class CGCoinTickersCron {
 
         while (true) {
             logger.info(`CGListModel offset ${dbOffset}`);
-            const ids = await cgModel.CGListModel.aggregate([
-                { $sort: { market_cap: -1 } },
-                { $skip: dbOffset },
-                { $limit: 1000 },
-                { $group: { _id: null, ids: { $addToSet: "$id" } } },
+            const ids = await cgModel.CGIdsModel.aggregate([
+                { $sort: { id: 1 } },
+                { $group: { _id: null, ids: { $push: "$id" } } },
             ]);
 
             if (ids.length < 1) {
@@ -40,7 +38,6 @@ class CGCoinTickersCron {
                 logger.info(`tickersPage ${tickersPage}, id: ${id}`);
                 while (true) {
                     const coinTickers = await cgApi.coinTickers(id, tickersPage);
-                    console.log(`1`, coinTickers);
 
                     if (!coinTickers) {
                         break;
