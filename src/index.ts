@@ -45,7 +45,7 @@ if (!process.env['CW_API_KEY']) {
         bqPairs.bqCronosPairs.start();
         bqPairs.bqCeloMainnetPairs.start();
 
-        cgCoinPrices.syncData();
+        cgCoinPrices.start();
         cgCoinIdsCron.cron.start();
         cgCoinInfoCron.cron.start();
 

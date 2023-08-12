@@ -1,6 +1,6 @@
+import cron from 'node-cron';
 import axiosUtil from '../utils/axios.util';
 import CoingeckoApi from '../utils/coingecko.utils';
-import delayExecution from '../utils/executionDelay.utils';
 import loggersUtil from '../utils/loggers.util';
 import cgModel from './cgModel';
 
@@ -9,6 +9,10 @@ const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
 class CGCoinPrices {
+    private cronExpression = '* * * * *' // every minute
+    cron = cron.schedule(this.cronExpression, async () => {
+        await this.syncData();
+    }, { scheduled: false });
     
     private async upsertData(data: any) {
         try {
@@ -43,7 +47,7 @@ class CGCoinPrices {
         }
     }
 
-    async syncData() {
+    private async syncData() {
         try {
             let dbOffset = 0;
 
@@ -76,16 +80,12 @@ class CGCoinPrices {
                 this.upsertData(coinPricesData);
                 dbOffset += coinsData.length;
             }
-
-            logger.info(`pairsPrices cooling down for 20 seconds`);
-            await delayExecution(20000);
-            this.syncData();
         } catch (error: any) {
             logger.error(error.message)
         }
     }
 }
 
-const cgCoinPrices = new CGCoinPrices()
+const cgCoinPrices = new CGCoinPrices().cron;
 
 export default cgCoinPrices;
