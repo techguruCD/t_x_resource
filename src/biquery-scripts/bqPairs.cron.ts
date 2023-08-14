@@ -42,8 +42,13 @@ class BQPairs {
     }
 
     private async syncData() {
-        const from = moment.utc().subtract(1, "days").format("YYYY-MM-DD");
-        const till = moment.utc().format("YYYY-MM-DD");
+        // Get the current date and time
+        const currentDate = moment();
+
+        const toDate = currentDate.clone().subtract(1, 'hour');
+
+        const from = currentDate.utc().format("YYYY-MM-DDTHH:mm:ss.000[Z]");
+        const till = toDate.utc().format("YYYY-MM-DDTHH:mm:ss.000[Z]");
 
         let offset = 0;
         
