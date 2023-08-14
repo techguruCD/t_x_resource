@@ -2,7 +2,7 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
   const query = `{
   ${networkQueryString}(network: ${network}) {
     dexTrades(
-      options: {desc: "tradeAmount", limit: ${limit}, offset: ${offset}}
+      options: {desc: "tradeAmount", limit: ${limit}, offset: ${offset}, limitBy: {each: "buyCurrency.address, sellCurrency.address", limit: 2}}
       date: {since: "${from}", till: "${till}"}
     ) {
       exchange {
