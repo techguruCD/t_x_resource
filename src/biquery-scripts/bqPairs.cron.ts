@@ -24,7 +24,22 @@ class BQPairs {
     }
 
     private async upsertData(list: any[]) {
-        const pairs = list.map((pair: any) => ({
+        const pairs = list.map((pair: any) => {
+            if (pair.usdPrice1 === "0.0" && pair.usdPrice3 === "0.0") {
+                pair['buyCurrencyPrice'] = pair.usdPrice2;
+                pair['sellCurrencyPrice'] = pair.usdPrice4;
+            } else if (pair.usdPrice2 === "0.0" && pair.usdPrice4 === "0.0") {
+                pair["buyCurrencyPrice"] = pair.usdPrice3
+                pair['sellCurrencyPrice'] = pair.usdPrice1;
+            } else if (pair.usdPrice1 !== "0.0" && pair.usdPrice2 !== "0.0" && pair.usdPrice3 !== "0.0" && pair.usdPrice4 !== "0.0") {
+                pair["buyCurrencyPrice"] = pair.usdPrice3
+                pair['sellCurrencyPrice'] = pair.usdPrice4;
+            } else {
+                pair["buyCurrencyPrice"] = "0.0"
+                pair['sellCurrencyPrice'] = "0.0";
+            }
+
+            return {
             updateOne: {
                 filter: {
                     network: this.network,
@@ -35,7 +50,8 @@ class BQPairs {
                 update: { $set: { network: this.network, ...pair } },
                 upsert: true
             }
-        }));
+        }
+        });
 
         const writeResult = await bqModel.BQPairModel.bulkWrite(pairs as any[]);
         logger.info(`Network ${this.network}, Total ${list.length}, Inserted ${writeResult.insertedCount}, Upserted ${writeResult.upsertedCount}, Modified ${writeResult.modifiedCount}`);

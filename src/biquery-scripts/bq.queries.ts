@@ -2,7 +2,7 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
   const query = `{
   ${networkQueryString}(network: ${network}) {
     dexTrades(
-      options: {desc: "tradeAmount", limit: ${limit}, offset: ${offset}, limitBy: {each: "buyCurrency.address, sellCurrency.address", limit: 2}}
+      options: {desc: ["block.height", "tradeIndex"], limit: ${limit}, offset: ${offset}, limitBy: {each: "buyCurrency.address, sellCurrency.address", limit: 1}}
       date: {since: "${from}", till: "${till}"}
     ) {
       exchange {
@@ -27,7 +27,7 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
         contractType
       }
       buyAmount
-      buy_amount_usd: buyAmount(in: USD)
+      buyAmountUsd: buyAmount(in: USD)
       buyCurrency {
         address
         decimals
@@ -37,7 +37,7 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
         tokenType
       }
       sellAmount
-      sell_amount_usd: sellAmount(in: USD)
+      sellAmountUSD: sellAmount(in: USD)
       sellCurrency {
         address
         decimals
@@ -46,12 +46,21 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
         tokenId
         tokenType	
       }
-      buyCurrencyPrice: expression(get: "buy_amount_usd / buyAmount")
-      sellCurrencyPrice: expression(get: "sell_amount_usd / sellAmount")
+      usdPrice1: expression(get: "buyAmountUSD / sellAmount")
+      usdPrice2: expression(get: "sellAmountUSD / buyAmount")
+      usdPrice3: expression(get: "buyAmountUSD / buyAmount")
+      usdPrice4: expression(get: "sellAmountUSD / sellAmount")
       count
       tradeAmount(in: USD)
       daysTraded: count(uniq: dates)
       started: minimum(of: date)
+      block {
+        height
+        timestamp {
+          iso8601
+        }
+      }
+      tradeIndex
     }
   }
 }
