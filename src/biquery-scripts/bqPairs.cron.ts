@@ -40,17 +40,17 @@ class BQPairs {
             }
 
             return {
-            updateOne: {
-                filter: {
-                    network: this.network,
-                    'smartContract.address.address': pair.smartContract.address.address,
-                    "buyCurrency.address": pair.buyCurrency.address,
-                    "sellCurrency.address": pair.sellCurrency.address
-                },
-                update: { $set: { network: this.network, ...pair } },
-                upsert: true
+                updateOne: {
+                    filter: {
+                        network: this.network,
+                        'smartContract.address.address': pair.smartContract.address.address,
+                        "buyCurrency.address": pair.buyCurrency.address,
+                        "sellCurrency.address": pair.sellCurrency.address
+                    },
+                    update: { $set: { network: this.network, ...pair } },
+                    upsert: true
+                }
             }
-        }
         });
 
         const writeResult = await bqModel.BQPairModel.bulkWrite(pairs as any[]);
