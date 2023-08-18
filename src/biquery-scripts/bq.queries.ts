@@ -27,7 +27,7 @@ function fetchPairs(network: string, limit: number, offset: number, from: string
         contractType
       }
       buyAmount
-      buyAmountUsd: buyAmount(in: USD)
+      buyAmountUSD: buyAmount(in: USD)
       buyCurrency {
         address
         decimals

@@ -61,7 +61,7 @@ class BQPairs {
         // Get the current date and time
         const currentDate = moment();
 
-        const toDate = currentDate.clone().subtract(1, 'hour');
+        const toDate = currentDate.clone().subtract(10, 'hour');
 
         const from = currentDate.utc().format("YYYY-MM-DDTHH:mm:ss.000[Z]");
         const till = toDate.utc().format("YYYY-MM-DDTHH:mm:ss.000[Z]");
