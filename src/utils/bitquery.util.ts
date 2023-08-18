@@ -2,7 +2,6 @@ import { AxiosInstance, isAxiosError } from "axios";
 import moment from 'moment';
 import winston from "winston";
 import bqQueries from "../biquery-scripts/bq.queries";
-import delayExecution from "./executionDelay.utils";
 
 class BitqueryApi {
     private axios: AxiosInstance;
@@ -44,7 +43,6 @@ class BitqueryApi {
                 till = moment.utc().format("YYYY-MM-DD");
             }
 
-            await delayExecution(1000);
             const query = bqQueries.fetchPairs(network, limit, offset, from, till, networkQueryString);
             const response = await this.axios.post('', { query, variables: {} });
             this.logger.info(`listPairs api call status ${response.status} for ${network}`);
