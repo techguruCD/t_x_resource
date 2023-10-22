@@ -3,9 +3,9 @@ dotenv.config();
 
 import mongoose from 'mongoose';
 import bqPairs from './biquery-scripts/bqPairs.cron';
-import cgCoinIdsCron from './cg-scripts/coinIds.cron';
-import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
-import cgCoinPrices from './cg-scripts/coinPrices.cron';
+// import cgCoinIdsCron from './cg-scripts/coinIds.cron';
+// import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
+// import cgCoinPrices from './cg-scripts/coinPrices.cron';
 import loggersUtil from './utils/loggers.util';
 
 
@@ -45,9 +45,9 @@ if (!process.env['CW_API_KEY']) {
         bqPairs.bqCronosPairs.start();
         bqPairs.bqCeloMainnetPairs.start();
 
-        cgCoinPrices.start();
-        cgCoinIdsCron.cron.start();
-        cgCoinInfoCron.cron.start();
+        // cgCoinPrices.start();
+        // cgCoinIdsCron.cron.start();
+        // cgCoinInfoCron.cron.start();
 
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);
