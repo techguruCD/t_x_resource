@@ -17,7 +17,10 @@ const config = {
     bitqueryUrl: "https://graphql.bitquery.io",
     bitqueryHeader: {
         'X-API-KEY': process.env['BQ_API_KEY']
-    }
+    },
+
+    aegisUrl: "https://api.aegisweb3.com",
+    aegisHeader: {}
 }
 
 export default config;

@@ -13,6 +13,7 @@ const axiosUtil = {
     coingeckoAxios: new Axios(config.coingeckoUrl, config.coingeckoHeaders).axiosInstance,
     cryptowatchAxios: new Axios(config.cryptowatchUrl, config.cryptowatchHeaders).axiosInstance,
     bitqueryAxios: new Axios(config.bitqueryUrl, config.bitqueryHeader).axiosInstance,
+    aegisAxios: new Axios(config.aegisUrl, config.aegisHeader).axiosInstance
 }
 
 export default axiosUtil;

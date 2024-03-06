@@ -80,11 +80,13 @@ class Logger {
 const mainLogger = new Logger('main-service', 'main-errors', 'main-combined').logger;
 const cgLogger = new Logger('cg-service', 'cg-errors', 'cg-combined').logger;
 const bitqueryLogger = new Logger('bitquery-service', 'bitquery-errors', 'bitquery-combined').logger;
+const aegisLogger = new Logger('aegis-service', 'aegis-errors', 'aegis-combined').logger;
 
 const loggersUtil = {
     mainLogger,
     cgLogger,
     bitqueryLogger,
+    aegisLogger
 }
 
 export default loggersUtil;
