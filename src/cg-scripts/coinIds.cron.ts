@@ -9,7 +9,7 @@ const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
 class CGCoinsIdsCron {
-    private cronExpression = '0 * * * *' // every hour
+    private cronExpression = '0 0 * * *' // every day midnight
     cron = cron.schedule(this.cronExpression, async () => {
         await this.fetchData();
     }, { scheduled: false });

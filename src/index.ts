@@ -6,6 +6,8 @@ import bqPairs from './biquery-scripts/bqPairs.cron';
 import cgCoinIdsCron from './cg-scripts/coinIds.cron';
 import cgCoinInfoCron from './cg-scripts/coinInfo.cron';
 import cgCoinPrices from './cg-scripts/coinPrices.cron';
+import cgExchangesCron from './cg-scripts/exchanges.cron';
+import cgExchangeTickersCron from './cg-scripts/exchangeTickers.cron';
 import loggersUtil from './utils/loggers.util';
 
 
@@ -48,7 +50,9 @@ if (!process.env['CW_API_KEY']) {
         cgCoinPrices.start();
         cgCoinIdsCron.cron.start();
         cgCoinInfoCron.cron.start();
-
+        cgExchangesCron.cron.start();
+        cgExchangesCron.cron.start();
+        cgExchangeTickersCron.cron.start();
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);
         process.exit(1);

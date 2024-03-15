@@ -49,7 +49,7 @@ const coinInfoSchema = new Schema({
     last_updated: String
 });
 
-const coinIds = new Schema ({
+const coinIds = new Schema({
     id: {
         type: String,
         index: true
@@ -65,14 +65,73 @@ const tickersSchema = new Schema({
     tickers: [Schema.Types.Mixed]
 });
 
+const exchangesSchema = new Schema({
+    id: {
+        type: String,
+        index: true
+    },
+    name: String,
+    year_established: Number,
+    country: String,
+    description: String,
+    url: String,
+    image: String,
+    has_trading_incentive: Boolean,
+    trust_score: Number,
+    trust_score_rank: Number,
+    trade_volume_24h_btc: Number,
+    trade_volume_24h_btc_normalized: Number
+});
+
+const exchangeTickersSchema = new Schema({
+    base: String,
+    target: String,
+    market: new Schema({
+        name: String,
+        identifier: String,
+        has_trading_incentive: Boolean,
+        logo: String
+    }),
+    last: Number,
+    volume: Number,
+    cost_to_move_up_usd: Number,
+    cost_to_move_down_usd: Number,
+    converted_last: new Schema({
+        btc: Number,
+        eth: Number,
+        usd: Number
+    }),
+    converted_volume: new Schema({
+        btc: Number,
+        eth: Number,
+        usd: Number
+    }),
+    trust_score: String,
+    bid_ask_spread_percentage: Number,
+    timestamp: String,
+    last_traded_at: String,
+    last_fetch_at: String,
+    is_anomaly: Boolean,
+    is_stale: Boolean,
+    trade_url: String,
+    token_info_url: String,
+    coin_id: String,
+    target_coin_id: String
+});
+
 const CGCoinInfoModel = model('CGInfo', coinInfoSchema, 'CGInfo');
 const CGTickersModel = model('CGTickers', tickersSchema, 'CGTickers');
 const CGIdsModel = model('CGIds', coinIds, 'CGIds');
 
+const CGExchangeModel = model('CGExchanges', exchangesSchema, 'CGExchanges');
+const CGExchangeTickerModel = model('CGExchangeTickers', exchangeTickersSchema, 'CGExchangeTickers');
+
 const cgModel = {
     CGCoinInfoModel,
     CGTickersModel,
-    CGIdsModel
+    CGIdsModel,
+    CGExchangeModel,
+    CGExchangeTickerModel
 };
 
 export default cgModel;
