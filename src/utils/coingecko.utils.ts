@@ -76,6 +76,34 @@ class CoingeckoApi {
         }
     }
 
+    async exchanges(page: Number = 1) {
+        const url = `/exchanges`
+        const params = { per_page: 250, page };
+        try {
+            const response = await this.axios.get(url, { params });
+            if (!response.data) {
+                return undefined
+            }
+            return response.data
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }))
+            return undefined
+        }
+    }
+
+    async exchangeTickers(exchangeId: String, page: Number = 1) {
+        const url = `/exchanges/${exchangeId}/tickers`
+        const params = { include_exchange_logo: true, depth: true, page };
+        try {
+            const response = await this.axios.get(url, { params });
+            if (!response.data) return undefined
+            return response.data.tickers;
+        } catch (error: any) {
+            this.logError(error, JSON.stringify({ url, params }))
+            return undefined
+        }
+    }
+
     async coinTickers(coin_id: string, page = 1) {
         const url = `/coins/${coin_id}/tickers`
 
