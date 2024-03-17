@@ -51,7 +51,6 @@ if (!process.env['CW_API_KEY']) {
         cgCoinIdsCron.cron.start();
         cgCoinInfoCron.cron.start();
         cgExchangesCron.cron.start();
-        cgExchangesCron.cron.start();
         cgExchangeTickersCron.cron.start();
     } catch (error: any) {
         loggersUtil.mainLogger.error(error.message ? `${error.message}` : `could not initiate service`);
