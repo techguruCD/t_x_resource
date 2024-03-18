@@ -10,7 +10,7 @@ const logger = loggersUtil.bitqueryLogger;
 const bitqueryApi = new BitqueryApi(axios, logger);
 
 class BQPairs {
-    private cronExpression = '*/2 * * * *' // every 2 minutes
+    private cronExpression = '*/5 * * * *' // every 5 minutes
     cron = cron.schedule(this.cronExpression, async () => {
         await this.syncData();
     }, { scheduled: false });
