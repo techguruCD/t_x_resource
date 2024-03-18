@@ -1,7 +1,7 @@
 import { AxiosInstance, isAxiosError } from "axios";
 import winston from "winston";
 import cgModel from "../cg-scripts/cgModel";
-// import delayExecution from "./executionDelay.utils";
+import delayExecution from "./executionDelay.utils";
 
 class CoingeckoApi {
     private axios: AxiosInstance;
@@ -46,7 +46,7 @@ class CoingeckoApi {
         }
     }
 
-    async coinInfo(coin_id: string) {
+    async coinInfo(coin_id: string, delay: number = -1) {
         const url = `/coins/${coin_id}`
         const params = {
             localization: 'en',
@@ -58,7 +58,9 @@ class CoingeckoApi {
         }
     
         try {
-            // await delayExecution(300);
+            if (delay > 0) {
+                await delayExecution(delay);
+            }
             const response = await this.axios.get(url, { params });
 
             if (!response.data) {
@@ -91,10 +93,13 @@ class CoingeckoApi {
         }
     }
 
-    async exchangeTickers(exchangeId: String, page: Number = 1) {
+    async exchangeTickers(exchangeId: String, page: Number = 1, delay : number = -1) {
         const url = `/exchanges/${exchangeId}/tickers`
         const params = { include_exchange_logo: true, depth: true, page };
         try {
+            if (delay > 0) {
+                await delayExecution(delay);
+            }
             const response = await this.axios.get(url, { params });
             if (!response.data) return undefined
             return response.data.tickers;

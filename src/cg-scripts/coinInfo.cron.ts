@@ -64,19 +64,24 @@ class CGCoinInfoCron {
         }
     }
 
+    async process(id: string) {
+        try {
+            const coinInfo = await cgApi.coinInfo(id, 1000);
+            if (!coinInfo) {
+                logger.error(`no info. coinid ${id}`);
+            }
+
+            logger.info(`upserting coinid ${id}`);
+            this.upsertData(id, coinInfo);
+        } catch (error: any) {
+            logger.error(error.message)
+        }
+    }
+
     async processGroup(group: any[]) {
         try {
-            for (const id of group) {
-                const coinInfo = await cgApi.coinInfo(id);
-
-                if (!coinInfo) {
-                    logger.error(`no info. coinid ${id}`);
-                    continue;
-                }
-
-                logger.info(`upserting coinid ${id}`);
-                this.upsertData(id, coinInfo);
-            }
+            let promiseArray = group.map(id => this.process(id));
+            await Promise.all(promiseArray);
         } catch (error: any) {
             logger.error(error.message)
         }
@@ -99,15 +104,24 @@ class CGCoinInfoCron {
 
         const array = ids[0].ids;
         const arrayLength = array.length;
-        const groupSize = Math.ceil(arrayLength / 5);
-        const groupedArrays = [];
+        const groupSize = 10;
 
         for (let i = 0; i < arrayLength; i += groupSize) {
             const group = array.slice(i, i + groupSize);
-            groupedArrays.push(this.processGroup(group));
+            await this.processGroup(group);
         }
 
-        await Promise.all(groupedArrays);
+        // const array = ids[0].ids;
+        // const arrayLength = array.length;
+        // const groupSize = Math.ceil(arrayLength / 5);
+        // const groupedArrays = [];
+
+        // for (let i = 0; i < arrayLength; i += groupSize) {
+        //     const group = array.slice(i, i + groupSize);
+        //     groupedArrays.push(this.processGroup(group));
+        // }
+
+        // await Promise.all(groupedArrays);
     }
 }
 
