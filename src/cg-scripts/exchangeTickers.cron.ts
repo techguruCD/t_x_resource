@@ -9,7 +9,7 @@ const logger = loggersUtil.cgLogger;
 const cgApi = new CoingeckoApi(axios, logger);
 
 class CGExchangeTickersCron {
-    private cronExpression = '0 1 * * *' // every midnight 1 o'clock
+    private cronExpression = '0 2 * * *' // every midnight 1 o'clock
     cron = cron.schedule(this.cronExpression, async () => {
         await this.fetchData();
     }, { scheduled: false });
@@ -35,7 +35,7 @@ class CGExchangeTickersCron {
     private async fetchDataByExchange(exchangeId: string) {
         for (let page = 1; ; page ++) {
             logger.info(`fetching CGExchangeTickers data page ${page} for ${exchangeId}`);
-            const exchangeTickersData = await cgApi.exchangeTickers(exchangeId, page);
+            const exchangeTickersData = await cgApi.exchangeTickers(exchangeId, page, 30);
             if (!exchangeTickersData || !exchangeTickersData.length) {
                 logger.info(`CGExchangeTickers data page(${page}) for ${exchangeId} no data fetched`);
                 break;
